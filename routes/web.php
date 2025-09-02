@@ -42,16 +42,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('role:admin,panitia');
 
     Route::resource('batting', BattingController::class)
+        ->except(['store', 'update', 'destroy'])
         ->names('batting')
         ->middleware('role:admin,panitia');
 
-
-    Route::middleware(['auth', 'role:manager'])->group(function () {
+    Route::middleware('role:manager')->group(function () {
         Route::post('/batting', [BattingController::class, 'store'])->name('batting.store');
         Route::put('/batting/{batting}', [BattingController::class, 'update'])->name('batting.update');
         Route::delete('/batting/{batting}', [BattingController::class, 'destroy'])->name('batting.destroy');
     });
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
