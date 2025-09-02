@@ -1,13 +1,24 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, Link } from "@inertiajs/vue3";
-import { computed } from "vue";
+import { Head, Link, router } from "@inertiajs/vue3";
+import { computed, ref } from "vue";
 
 const props = defineProps({
     teams: Array,
 });
 
 const teams = computed(() => props.teams || []);
+
+const selectedTeam = ref(null);
+
+function deleteTeam(id) {
+    router.delete(route("team.destroy", id), {
+        onSuccess: () => {
+            selectedTeam.value = null;
+        },
+        onError: () => {},
+    });
+}
 </script>
 
 <template>
@@ -43,7 +54,8 @@ const teams = computed(() => props.teams || []);
                                     <th class="px-4 py-2 border">Team Name</th>
                                     <th class="px-4 py-2 border">Head Coach</th>
                                     <th class="px-4 py-2 border">Coach</th>
-                                    <th class="px-4 py-2 border">Players</th>
+                                    <th class="px-4 py-2 border">Total Players</th>
+                                    <th class="px-4 py-2 border">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,23 +77,80 @@ const teams = computed(() => props.teams || []);
                                         {{ team.coach }}
                                     </td>
                                     <td class="px-4 py-2 border">
-                                        <ul
+                                        <div
                                             v-if="
                                                 team.players &&
                                                 team.players.length
                                             "
                                             class="list-disc pl-5"
                                         >
-                                            <li
-                                                v-for="p in team.players"
-                                                :key="p.id"
-                                            >
-                                                {{ p.name }} (#{{ p.jersey }})
-                                            </li>
-                                        </ul>
+                                            {{ team.players.length }}
+                                        </div>
                                         <span v-else class="text-gray-400">
                                             No players
                                         </span>
+                                    </td>
+                                    <td
+                                        class="px-4 py-2 border whitespace-nowrap items-center justify-center flex"
+                                    >
+                                        <Link
+                                            class="btn btn-sm btn-info mr-2 text-white"
+                                            :href="route('team.show', team.id)"
+                                        >
+                                            Detail
+                                        </Link>
+                                        <Link
+                                            class="btn btn-sm btn-primary mr-2"
+                                            :href="route('team.edit', team.id)"
+                                        >
+                                            Edit
+                                        </Link>
+                                        <label
+                                            for="delete-modal"
+                                            class="btn btn-sm btn-error text-white cursor-pointer"
+                                            @click="selectedTeam = team"
+                                        >
+                                            Delete
+                                        </label>
+
+                                        <input
+                                            type="checkbox"
+                                            id="delete-modal"
+                                            class="modal-toggle"
+                                        />
+                                        <div class="modal">
+                                            <div class="modal-box">
+                                                <h3 class="font-bold text-lg">
+                                                    Confirm Delete
+                                                </h3>
+                                                <p class="py-4">
+                                                    Are you sure you want to
+                                                    delete
+                                                    <span class="font-semibold">
+                                                        {{
+                                                            selectedTeam?.team_name
+                                                        }} </span
+                                                    >?
+                                                </p>
+                                                <div class="modal-action">
+                                                    <label
+                                                        for="delete-modal"
+                                                        class="btn"
+                                                        >Cancel</label
+                                                    >
+                                                    <button
+                                                        class="btn btn-error text-white"
+                                                        @click="
+                                                            deleteTeam(
+                                                                selectedTeam.id
+                                                            )
+                                                        "
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>

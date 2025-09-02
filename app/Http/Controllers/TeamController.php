@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Models\User;
 use Inertia\Inertia;
+use App\Models\Player;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class TeamController extends Controller
 {
@@ -24,8 +27,9 @@ class TeamController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Team/Create', [
-            'managers' => User::where('role', 'manager')->get(),
+        return Inertia::render('Team/Form', [
+            'managers' => User::where('role', 'manager')->whereDoesntHave('team')->get(),
+            'mode' => 'create',
         ]);
     }
 
@@ -39,14 +43,32 @@ class TeamController extends Controller
             'id_manager' => 'required|exists:users,id',
             'team_name' => 'required|string|max:255',
             'head_coach' => 'required|string|max:255',
-            'coach' => 'required|string|max:255',
+            'coach' => 'nullable|string|max:255',
+            'players' => 'required|array|min:1',
+            'players.*.full_name' => 'required|string|max:255',
+            'players.*.position' => 'required|string|max:255',
+            'players.*.back_number' => 'required|numeric',
+            'players.*.birth_date' => 'required|date',
         ]);
 
-        if ($request->hasFile('logo')) {
-            $validated['logo'] = $request->file('logo')->store('logos', 'public');
-        }
+        DB::transaction(function () use ($request, &$team) {
+            $data = $request->only(['logo', 'id_manager', 'team_name', 'head_coach', 'coach']);
 
-        $team = Team::create($validated);
+            if ($request->hasFile('logo')) {
+                $data['logo'] = $request->file('logo')->store('logos', 'public');
+            }
+
+            $team = Team::create($data);
+
+            foreach ($request->players as $p) {
+                $team->players()->create([
+                    'full_name' => $p['name'],
+                    'position' => $p['position'],
+                    'back_number' => $p['number'],
+                    'birth_date' => $p['birthdate'],
+                ]);
+            }
+        });
 
         return redirect()->route('team.index')->with('success', 'Team created successfully.');
     }
@@ -56,7 +78,14 @@ class TeamController extends Controller
      */
     public function show(Team $team)
     {
-        //
+        $team->load('players');
+
+        return Inertia::render('Team/Form', [
+            'team' => $team,
+            'teamPlayers' => $team->players,
+            'managers' => User::where('role', 'manager')->get(),
+            'mode' => 'detail',
+        ]);
     }
 
     /**
@@ -64,7 +93,14 @@ class TeamController extends Controller
      */
     public function edit(Team $team)
     {
-        //
+        $team->load('players');
+
+        return Inertia::render('Team/Form', [
+            'team' => $team,
+            'teamPlayers' => $team->players,
+            'managers' => User::where('role', 'manager')->get(),
+            'mode' => 'edit',
+        ]);
     }
 
     /**
@@ -72,7 +108,51 @@ class TeamController extends Controller
      */
     public function update(Request $request, Team $team)
     {
-        //
+        // Ensure players array is present
+        $requestData = $request->all();
+        $players = $requestData['players'] ?? [];
+
+        $validated = $request->validate([
+            'team_name' => 'required|string|max:255',
+            'head_coach' => 'required|string|max:255',
+            'coach' => 'nullable|string|max:255',
+            'id_manager' => 'required|exists:users,id',
+            'players' => 'required|array|min:1',
+            'players.*.full_name' => 'required|string|max:255',
+            'players.*.position' => 'required|string|max:255',
+            'players.*.back_number' => 'required|numeric',
+            'players.*.birth_date' => 'required|date',
+            'logo' => 'nullable|image|max:2048',
+        ]);
+
+        if ($request->hasFile('logo')) {
+            $logoFile = $request->file('logo');
+            $filename = $team->id . '.' . $logoFile->getClientOriginalExtension();
+
+            $path = $logoFile->storeAs('logos', $filename, 'public');
+
+            $validated['logo'] = URL::to('/storage/' . $path);
+        } else {
+            unset($validated['logo']);
+        }
+
+
+        $team->update($validated);
+
+        // Update or create players
+        foreach ($players as $p) {
+            $team->players()->updateOrCreate(
+                ['id' => $p['id'] ?? null],
+                [
+                    'full_name' => $p['full_name'],
+                    'position' => $p['position'],
+                    'back_number' => $p['back_number'],
+                    'birth_date' => $p['birth_date'],
+                ]
+            );
+        }
+
+        return redirect()->route('team.index')->with('success', 'Team updated successfully.');
     }
 
     /**
@@ -80,6 +160,8 @@ class TeamController extends Controller
      */
     public function destroy(Team $team)
     {
-        //
+        $team->delete();
+
+        return redirect()->route('team.index')->with('success', 'Team deleted successfully.');
     }
 }

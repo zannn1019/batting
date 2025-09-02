@@ -30,6 +30,8 @@ class User extends Authenticatable
         'role'
     ];
 
+    protected $with = ['team'];
+
     /**
      * The attributes that should be hidden for serialization.
      *

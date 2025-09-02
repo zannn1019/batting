@@ -7,6 +7,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BattingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -18,8 +19,10 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
     Route::get('/team', fn() => 'tes')->name('team');
+    Route::put('/batting/{id}/approve', [BattingController::class, 'approve'])->name('batting.approve');
+    Route::delete('/batting/{id}/reject', [BattingController::class, 'reject'])->name('batting.reject');
     Route::resource('user', UserController::class)->names('user');
     Route::resource('team', TeamController::class)->names('team');
     Route::resource('batting', BattingController::class)->names('batting');

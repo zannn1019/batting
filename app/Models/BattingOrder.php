@@ -16,6 +16,8 @@ class BattingOrder extends Model
         'is_extra_player',
     ];
 
+    protected $table = 'batting_order';
+
     public function batting()
     {
         return $this->belongsTo(Batting::class, 'batting_id');

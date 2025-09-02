@@ -47,12 +47,22 @@ const showingNavigationDropdown = ref(false);
                                     User
                                 </NavLink>
                                 <NavLink
+                                    v-if="
+                                        $page.props.auth.user.role ===
+                                            'admin' ||
+                                        $page.props.auth.user.role === 'panitia'
+                                    "
                                     :href="route('team.index')"
                                     :active="route().current('team.index')"
                                 >
                                     Team
                                 </NavLink>
                                 <NavLink
+                                    v-if="
+                                        $page.props.auth.user.role ===
+                                            'admin' ||
+                                        $page.props.auth.user.role === 'panitia'
+                                    "
                                     :href="route('batting.index')"
                                     :active="route().current('batting.index')"
                                 >

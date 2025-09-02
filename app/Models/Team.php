@@ -17,6 +17,8 @@ class Team extends Model
         'coach',
     ];
 
+    protected $with = ['players'];
+
     public function manager()
     {
         return $this->belongsTo(User::class, 'id_manager');
@@ -31,7 +33,6 @@ class Team extends Model
     {
         return $this->hasMany(Batting::class, 'team_id');
     }
-    // 🔗 Relasi: Tim bisa jadi lawan di banyak Batting Order
     public function opponents()
     {
         return $this->hasMany(Batting::class, 'opponent_id');

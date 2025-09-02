@@ -16,6 +16,8 @@ class Batting extends Model
         'approved_at',
     ];
 
+    protected $table = 'batting';
+
     public function team()
     {
         return $this->belongsTo(Team::class, 'team_id');

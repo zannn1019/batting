@@ -17,7 +17,9 @@ function deleteUser(userId) {
         onSuccess: () => {
             selectedUser.value = null;
         },
-        onError: () => {},
+        onError: () => {
+            selectedUser.value = null;
+        },
     });
 }
 </script>
