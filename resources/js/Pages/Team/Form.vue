@@ -32,6 +32,13 @@ watch(
     { immediate: true }
 );
 
+function isPositionTaken(position, currentIndex) {
+  return players.value.some(
+    (p, i) => i !== currentIndex && p.position == position
+  );
+}
+
+
 const form = useForm({
     team_name: props.team?.team_name ?? "",
     head_coach: props.team?.head_coach ?? "",
@@ -83,8 +90,8 @@ function submit() {
     form.players = players.value.map((p) => ({
         id: p.id,
         full_name: p.name,
-        position: p.position,
-    back_number: p.number,
+        position: String(p.position),
+        back_number: p.number,
         birth_date: p.birthdate,
     }));
 
@@ -302,37 +309,21 @@ onMounted(() => {
                                                 <option disabled value="">
                                                     -- Select Position --
                                                 </option>
-                                                <option value="Pitcher">
-                                                    Pitcher (P)
-                                                </option>
-                                                <option value="Catcher">
-                                                    Catcher (C)
-                                                </option>
-                                                <option value="First Baseman">
-                                                    First Baseman (1B)
-                                                </option>
-                                                <option value="Second Baseman">
-                                                    Second Baseman (2B)
-                                                </option>
-                                                <option value="Third Baseman">
-                                                    Third Baseman (3B)
-                                                </option>
-                                                <option value="Shortstop">
-                                                    Shortstop (SS)
-                                                </option>
-                                                <option value="Left Fielder">
-                                                    Left Fielder (LF)
-                                                </option>
-                                                <option value="Center Fielder">
-                                                    Center Fielder (CF)
-                                                </option>
-                                                <option value="Right Fielder">
-                                                    Right Fielder (RF)
-                                                </option>
                                                 <option
-                                                    value="Designated Hitter"
+                                                    v-for="n in 10"
+                                                    :key="n"
+                                                    :value="n"
+                                                    :disabled="
+                                                        isPositionTaken(
+                                                            n,
+                                                            index
+                                                        )
+                                                    "
                                                 >
-                                                    Designated Hitter (DH)
+                                                    {{ n }}
+                                                </option>
+                                                <option value="EP">
+                                                    EP (Extra Player)
                                                 </option>
                                             </select>
                                         </td>
