@@ -218,7 +218,6 @@
             </form>
         </div>
     </div>
-    {{ positions }}
 </template>
 
 <script setup>

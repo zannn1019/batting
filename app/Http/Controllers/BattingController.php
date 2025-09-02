@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use Inertia\Inertia;
-use App\Models\Player;
 use App\Models\Batting;
 use App\Models\User;
 use App\Services\WhatsAppService;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
