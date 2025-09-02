@@ -62,10 +62,10 @@ class TeamController extends Controller
 
             foreach ($request->players as $p) {
                 $team->players()->create([
-                    'full_name' => $p['name'],
+                    'full_name' => $p['full_name'],
                     'position' => $p['position'],
-                    'back_number' => $p['number'],
-                    'birth_date' => $p['birthdate'],
+                    'back_number' => $p['back_number'],
+                    'birth_date' => $p['birth_date'],
                 ]);
             }
         });
