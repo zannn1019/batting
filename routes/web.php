@@ -19,13 +19,38 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
-    Route::get('/team', fn() => 'tes')->name('team');
-    Route::put('/batting/{id}/approve', [BattingController::class, 'approve'])->name('batting.approve');
-    Route::delete('/batting/{id}/reject', [BattingController::class, 'reject'])->name('batting.reject');
-    Route::resource('user', UserController::class)->names('user');
-    Route::resource('team', TeamController::class)->names('team');
-    Route::resource('batting', BattingController::class)->names('batting');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/team', fn() => 'tes')
+        ->name('team')
+        ->middleware('role:admin,panitia');
+
+    Route::put('/batting/{id}/approve', [BattingController::class, 'approve'])
+        ->name('batting.approve')
+        ->middleware('role:admin,panitia');
+
+    Route::delete('/batting/{id}/reject', [BattingController::class, 'reject'])
+        ->name('batting.reject')
+        ->middleware('role:admin,panitia');
+
+    Route::resource('user', UserController::class)
+        ->names('user')
+        ->middleware('role:admin,panitia');
+
+    Route::resource('team', TeamController::class)
+        ->names('team')
+        ->middleware('role:admin,panitia');
+
+    Route::resource('batting', BattingController::class)
+        ->names('batting')
+        ->middleware('role:admin,panitia');
+
+
+    Route::middleware(['auth', 'role:manager'])->group(function () {
+        Route::post('/batting', [BattingController::class, 'store'])->name('batting.store');
+        Route::put('/batting/{batting}', [BattingController::class, 'update'])->name('batting.update');
+        Route::delete('/batting/{batting}', [BattingController::class, 'destroy'])->name('batting.destroy');
+    });
 });
 
 Route::middleware('auth')->group(function () {
