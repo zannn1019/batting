@@ -106,7 +106,7 @@
     </div>
 
     <!-- Batting Order Table --> <div class="bg-white shadow sm:rounded-lg p-6 space-y-4 mb-6">
-      <h3 class="text-lg font-bold mb-4">Match Info</h3>
+      <h3 class="text-lg font-bold mb-4">Batting Orders</h3>
     <form @submit.prevent="submitOrder" class="space-y-6">
       <table class="table table-zebra w-full">
         <thead>
