@@ -9,24 +9,6 @@ const props = defineProps({
 
 const battings = computed(() => props.battings || []);
 const selectedBatting = ref(null);
-
-// Approve batting
-function approveBatting(id) {
-    router.put(route("batting.approve", id), {}, {
-        onSuccess: () => {
-            selectedBatting.value = null;
-        },
-    });
-}
-
-// Reject batting
-function rejectBatting(id) {
-    router.delete(route("batting.reject", id), {
-        onSuccess: () => {
-            selectedBatting.value = null;
-        },
-    });
-}
 </script>
 
 <template>
@@ -114,25 +96,6 @@ function rejectBatting(id) {
                                         >
                                             Detail
                                         </label>
-
-                                        <!-- Approve -->
-                                        <button
-                                            class="btn btn-sm btn-success text-white"
-                                            @click="approveBatting(batting.id)"
-                                            v-if="batting.status === 'pending'"
-                                        >
-                                            Approve
-                                        </button>
-
-                                        <!-- Reject -->
-                                        <label
-                                            for="reject-modal"
-                                            class="btn btn-sm btn-error text-white cursor-pointer"
-                                            @click="selectedBatting = batting"
-                                            v-if="batting.status === 'pending'"
-                                        >
-                                            Reject
-                                        </label>
                                     </td>
                                 </tr>
                             </tbody>
@@ -171,7 +134,7 @@ function rejectBatting(id) {
                                 <td class="px-4 py-2 border text-center">{{ index + 1 }}</td>
                                 <td class="px-4 py-2 border">{{ player.player.full_name }}</td>
                                 <td class="px-4 py-2 border">{{ player.player.position }}</td>
-                                <td class="px-4 py-2 border text-center">{{ player.batting_position }} - ({{ player.is_extra_player == 1 ? 'Extra' : 'Main' }})</td>
+                                <td class="px-4 py-2 border text-center">{{ player.batting_position }}</td>
                             </tr>
                         </tbody>
                     </table>

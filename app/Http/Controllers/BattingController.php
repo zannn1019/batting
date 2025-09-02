@@ -6,6 +6,9 @@ use App\Models\Team;
 use Inertia\Inertia;
 use App\Models\Player;
 use App\Models\Batting;
+use App\Models\User;
+use App\Services\WhatsAppService;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -61,8 +64,22 @@ class BattingController extends Controller
             $batting->battingOrders()->create([
                 'id_player' => $player['id'],
                 'batting_position' => $player['batting_position'],
-                'is_extra_player' => $player['is_extra_player'] ?? false,
             ]);
+        }
+        $batting->load(['team', 'opponent']);
+
+        $whatsApp = new WhatsAppService();
+        $panitia = User::where('role', 'panitia')->get();
+        $message = 'Tim ' . $batting->team->team_name . ' telah menambahkan batting order melawan ' . $batting->opponent->team_name . '. Silakan untuk mengunjungi link berikut: ' . route('batting.index');
+
+        foreach ($panitia as $user) {
+            if (!empty($user->phone)) {
+                $phone = $user->phone;
+                if (strpos($phone, '08') === 0) {
+                    $phone = '+62' . substr($phone, 1);
+                }
+                $whatsApp->sendMessage($phone, $message);
+            }
         }
 
         return redirect()->route('dashboard')->with('success', 'Batting order submitted successfully.');
@@ -97,17 +114,18 @@ class BattingController extends Controller
     /**
      * Update the specified batting order.
      */
-    public function update(Request $request, Batting $batting)
+    public function update(Request $request, $batting)
     {
         $validated = $request->validate([
             'team_id' => 'required|exists:teams,id',
             'opponent_id' => 'required|exists:teams,id',
             'game_date' => 'required|date',
             'players' => 'required|array|min:1',
-            'players.*.id_player' => 'required|exists:players,id',
-            'players.*.batting_position' => 'required|integer|min:1',
-            'players.*.is_extra_player' => 'sometimes|boolean',
+            'players.*.id' => 'required|exists:players,id',
+            'players.*.batting_position' => 'required|min:1',
         ]);
+
+        $batting = Batting::findOrFail($batting)->load(['team', 'opponent']);
 
         DB::transaction(function () use ($batting, $validated) {
             // update batting main info
@@ -123,15 +141,27 @@ class BattingController extends Controller
             // re-create orders
             foreach ($validated['players'] as $player) {
                 $batting->battingOrders()->create([
-                    'id_player'       => $player['id_player'],
+                    'id_player'       => $player['id'],
                     'batting_position' => $player['batting_position'],
-                    'is_extra_player' => $player['is_extra_player'] ?? false,
                 ]);
             }
         });
 
         if ($request->wantsJson()) {
             return response()->json(['message' => 'Batting order updated successfully.']);
+        }
+        $whatsApp = new WhatsAppService();
+        $panitia = User::where('role', 'panitia')->get();
+        $message = 'Tim ' . $batting->team->team_name . ' telah memperbarui batting order melawan ' . $batting->opponent->team_name . '. Silakan untuk mengunjungi link berikut: ' . route('batting.index');
+
+        foreach ($panitia as $user) {
+            if (!empty($user->phone)) {
+                $phone = $user->phone;
+                if (strpos($phone, '08') === 0) {
+                    $phone = '+62' . substr($phone, 1);
+                }
+                $whatsApp->sendMessage($phone, $message);
+            }
         }
 
         return redirect()

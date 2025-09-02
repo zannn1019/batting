@@ -1,17 +1,50 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import { usePage } from "@inertiajs/vue3";
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
 import { Link } from "@inertiajs/vue3";
+import Notification from "@/Components/Notification.vue";
 
 const showingNavigationDropdown = ref(false);
+const notifications = ref([]);
+
+const page = usePage();
+
+function addNotification(message, type = "success") {
+    notifications.value.push({ id: Date.now(), message, type });
+    setTimeout(() => {
+        notifications.value.shift();
+    }, 3000);
+}
+
+watch(
+    () => page.props.flash,
+    (flash) => {
+        if (flash.success) addNotification(flash.success, "success");
+        if (flash.error) addNotification(flash.error, "error");
+        if (flash.warning) addNotification(flash.warning, "warning");
+        if (flash.info) addNotification(flash.info, "info");
+    },
+    { immediate: true, deep: true }
+);
+
+defineExpose({ addNotification });
 </script>
 
 <template>
     <div data-theme="light">
+       <div class="fixed top-0 right-0 z-50 p-4 space-y-2">
+            <Notification
+                v-for="n in notifications"
+                :key="n.id"
+                :message="n.message"
+                :type="n.type"
+            />
+        </div>
         <div class="min-h-screen bg-gray-100">
             <nav class="border-b border-gray-100 bg-white">
                 <!-- Primary Navigation Menu -->

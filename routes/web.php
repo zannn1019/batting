@@ -25,14 +25,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('team')
         ->middleware('role:admin,panitia');
 
-    Route::put('/batting/{id}/approve', [BattingController::class, 'approve'])
-        ->name('batting.approve')
-        ->middleware('role:admin,panitia');
-
-    Route::delete('/batting/{id}/reject', [BattingController::class, 'reject'])
-        ->name('batting.reject')
-        ->middleware('role:admin,panitia');
-
     Route::resource('user', UserController::class)
         ->names('user')
         ->middleware('role:admin,panitia');

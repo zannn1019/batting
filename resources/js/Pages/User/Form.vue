@@ -32,6 +32,7 @@ const isEdit = computed(() => props.mode === "edit");
 const form = useForm({
     name: props.user?.name || "",
     email: props.user?.email || "",
+    phone: props.user?.phone || "", // <-- Added phone
     password: props.user ? "" : generateRandomPassword(),
     password_confirmation: "",
     role: props.user?.role || "",
@@ -119,6 +120,23 @@ onMounted(() => {
                                 <InputError
                                     class="mt-2"
                                     :message="form.errors.email"
+                                />
+                            </div>
+
+                            <div class="mb-4">
+                                <InputLabel for="phone" value="Phone" />
+                                <TextInput
+                                    id="phone"
+                                    type="text"
+                                    class="mt-1 block w-full"
+                                    v-model="form.phone"
+                                    :readonly="isDetail"
+                                    required
+                                    autocomplete="tel"
+                                />
+                                <InputError
+                                    class="mt-2"
+                                    :message="form.errors.phone"
                                 />
                             </div>
 
@@ -212,6 +230,16 @@ onMounted(() => {
                                     type="email"
                                     class="mt-1 block w-full"
                                     :model-value="form.email"
+                                    readonly
+                                />
+                            </div>
+                            <div class="mb-4">
+                                <InputLabel for="phone" value="Phone" />
+                                <TextInput
+                                    id="phone"
+                                    type="text"
+                                    class="mt-1 block w-full"
+                                    :model-value="form.phone"
                                     readonly
                                 />
                             </div>

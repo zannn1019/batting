@@ -13,7 +13,6 @@ class BattingOrder extends Model
         'batting_id',
         'id_player',
         'batting_position',
-        'is_extra_player',
     ];
 
     protected $table = 'batting_order';

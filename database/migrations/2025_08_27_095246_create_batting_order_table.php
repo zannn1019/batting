@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('batting_id')->constrained('batting')->onDelete('cascade');
             $table->foreignId('id_player')->constrained('players')->onDelete('cascade');
-            $table->integer('batting_position');
-            $table->boolean('is_extra_player')->default(false);
+            $table->string('batting_position');
             $table->timestamps();
         });
     }

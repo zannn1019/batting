@@ -36,6 +36,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
+            'phone' => 'nullable|string|max:15',
             'role' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
@@ -45,6 +46,7 @@ class UserController extends Controller
             'email' => $validated['email'],
             'role' => $validated['role'],
             'password' => bcrypt($validated['password']),
+            'phone' => $validated['phone'],
         ]);
 
         return redirect()->route('user.index')->with('success', 'User created successfully.');
@@ -82,6 +84,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
+            'phone' => 'nullable|string|max:15',
             'role' => 'required|string',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -90,6 +93,7 @@ class UserController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
+        $user->phone = $validated['phone'];
 
         if (!empty($validated['password'])) {
             $user->password = bcrypt($validated['password']);
