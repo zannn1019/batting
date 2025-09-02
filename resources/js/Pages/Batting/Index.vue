@@ -105,7 +105,7 @@ function rejectBatting(id) {
                                             {{ batting.status }}
                                         </span>
                                     </td>
-                                    <td class="px-4 py-2 border ">
+                                    <td class="px-4 py-2 border space-x-2">
                                         <!-- Detail -->
                                         <label
                                             for="detail-modal"
