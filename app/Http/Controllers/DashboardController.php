@@ -20,6 +20,7 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'auth' => ['user' => $user],
             'team' => $team ? $team->load('players') : null,
+            'teams' => Team::with('players')->get(),
             'opponents' => $team ? Team::where('id', '!=', $team->id)->get() : [],
             'submittedOrders' => $submittedOrder,
             'stats' => [
