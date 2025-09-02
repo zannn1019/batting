@@ -8,15 +8,18 @@ const props = defineProps({
 });
 
 const teams = computed(() => props.teams || []);
-
+const isModalOpen = ref(false);
 const selectedTeam = ref(null);
 
 function deleteTeam(id) {
     router.delete(route("team.destroy", id), {
         onSuccess: () => {
             selectedTeam.value = null;
+            isModalOpen.value = false;
         },
-        onError: () => {},
+        onError: () => {
+            isModalOpen.value = false;
+        },
     });
 }
 </script>
@@ -54,7 +57,9 @@ function deleteTeam(id) {
                                     <th class="px-4 py-2 border">Team Name</th>
                                     <th class="px-4 py-2 border">Head Coach</th>
                                     <th class="px-4 py-2 border">Coach</th>
-                                    <th class="px-4 py-2 border">Total Players</th>
+                                    <th class="px-4 py-2 border">
+                                        Total Players
+                                    </th>
                                     <th class="px-4 py-2 border">Actions</th>
                                 </tr>
                             </thead>
@@ -114,10 +119,12 @@ function deleteTeam(id) {
                                         </label>
 
                                         <input
+                                            v-model="isModalOpen"
                                             type="checkbox"
                                             id="delete-modal"
                                             class="modal-toggle"
                                         />
+
                                         <div class="modal">
                                             <div class="modal-box">
                                                 <h3 class="font-bold text-lg">

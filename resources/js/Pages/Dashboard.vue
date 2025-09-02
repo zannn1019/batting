@@ -30,8 +30,6 @@ const opponents = page.opponents;
 const submittedOrders = page.submittedOrders;
 const stats = page.stats;
 
-console.log("Dashboard props:", page);
-
 const dashboards = {
     admin: AdminDashboard,
     panitia: PanitiaDashboard,

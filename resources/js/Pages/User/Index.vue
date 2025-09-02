@@ -9,16 +9,18 @@ defineProps({
         required: true,
     },
 });
-
+const isModalOpen = ref(false);
 const selectedUser = ref(null);
 
 function deleteUser(userId) {
     router.delete(route("user.destroy", userId), {
         onSuccess: () => {
             selectedUser.value = null;
+            isModalOpen.value = false;
         },
         onError: () => {
             selectedUser.value = null;
+            isModalOpen.value = false;
         },
     });
 }
@@ -92,11 +94,8 @@ function deleteUser(userId) {
                                             Delete
                                         </label>
 
-                                        <input
-                                            type="checkbox"
-                                            id="delete-modal"
-                                            class="modal-toggle"
-                                        />
+                                        <input v-model="isModalOpen" type="checkbox" id="delete-modal" class="modal-toggle" />
+
                                         <div class="modal">
                                             <div class="modal-box">
                                                 <h3 class="font-bold text-lg">
