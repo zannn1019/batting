@@ -47,7 +47,7 @@ function exportToPDF() {
     );
     doc.text(`Game Date: ${selectedBatting.value.game_date || "—"}`, 14, 38);
 
-    const tableColumn = ["#", "Player Name", "Position", "Back Number"];
+    const tableColumn = ["#", "Player Name", "Player Position", "Batting Order", "Back Number"];
     const tableRows = [];
     if (selectedBatting.value.batting_orders?.length) {
         const sortedOrders = getSortedOrders(
@@ -58,6 +58,7 @@ function exportToPDF() {
                 index + 1,
                 player.player.full_name,
                 player.player.position,
+                player.batting_position || "-",
                 "#" + player.player.back_number,
             ]);
         });
