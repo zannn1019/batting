@@ -67,7 +67,7 @@ class BattingController extends Controller
         $batting->load(['team', 'opponent']);
 
         $whatsApp = new WhatsAppService();
-        $panitia = User::where('role', 'panitia')->get();
+        $panitia = User::whereIn('role', ['panitia', 'admin'])->get();
         $message = 'Tim ' . $batting->team->team_name . ' telah menambahkan batting order melawan ' . $batting->opponent->team_name . '. Silakan untuk mengunjungi link berikut: ' . route('batting.index');
 
         foreach ($panitia as $user) {
@@ -149,7 +149,7 @@ class BattingController extends Controller
             return response()->json(['message' => 'Batting order updated successfully.']);
         }
         $whatsApp = new WhatsAppService();
-        $panitia = User::where('role', 'panitia')->get();
+        $panitia = User::whereIn('role', ['panitia', 'admin'])->get();
         $message = 'Tim ' . $batting->team->team_name . ' telah memperbarui batting order melawan ' . $batting->opponent->team_name . '. Silakan untuk mengunjungi link berikut: ' . route('batting.index');
 
         foreach ($panitia as $user) {
