@@ -67,7 +67,7 @@ function addPlayer() {
         id: null,
         name: "",
         position: "utility",
-        number: "",
+        number: null,
         birthdate: "",
     });
 }
