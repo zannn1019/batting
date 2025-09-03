@@ -39,7 +39,7 @@ function exportToPDF() {
     );
 
     // Table data
-    const tableColumn = ["#", "Player Name", "Position", "Batting Order"];
+    const tableColumn = ["#", "Player Name", "Position", "Back Number"];
     const tableRows = [];
 
     if (selectedBatting.value.batting_orders?.length) {
@@ -48,7 +48,7 @@ function exportToPDF() {
                 index + 1,
                 player.player.full_name,
                 player.player.position,
-                player.batting_position,
+                "#" + player.player.back_number,
             ]);
         });
     } else {

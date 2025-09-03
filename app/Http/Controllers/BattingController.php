@@ -48,7 +48,7 @@ class BattingController extends Controller
             'game_date' => 'required|date',
             'players' => 'required|array',
             'players.*.id' => 'required|exists:players,id',
-            'players.*.batting_position' => 'required|integer|min:1',
+            'players.*.batting_position' => 'required|min:1',
         ]);
 
         $batting = Batting::create([
