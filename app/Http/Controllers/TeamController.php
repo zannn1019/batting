@@ -48,7 +48,7 @@ class TeamController extends Controller
             'players.*.full_name' => 'required|string|max:255',
             'players.*.position' => 'required|string|max:255',
             'players.*.back_number' => 'required|numeric',
-            'players.*.birth_date' => 'required|date',
+            'players.*.birth_date' => 'nullable|date',
         ]);
 
         DB::transaction(function () use ($request, &$team) {
@@ -121,7 +121,7 @@ class TeamController extends Controller
             'players.*.full_name' => 'required|string|max:255',
             'players.*.position' => 'required|string|max:255',
             'players.*.back_number' => 'required|numeric',
-            'players.*.birth_date' => 'required|date',
+            'players.*.birth_date' => 'nullable|date',
             'logo' => 'nullable|image|max:2048',
         ]);
 

@@ -33,11 +33,10 @@ watch(
 );
 
 function isPositionTaken(position, currentIndex) {
-  return players.value.some(
-    (p, i) => i !== currentIndex && p.position == position
-  );
+    return players.value.some(
+        (p, i) => i !== currentIndex && p.position == position
+    );
 }
-
 
 const form = useForm({
     team_name: props.team?.team_name ?? "",
@@ -67,7 +66,7 @@ function addPlayer() {
     players.value.push({
         id: null,
         name: "",
-        position: "",
+        position: "utility",
         number: "",
         birthdate: "",
     });
@@ -309,21 +308,20 @@ onMounted(() => {
                                                 <option disabled value="">
                                                     -- Select Position --
                                                 </option>
-                                                <option
-                                                    v-for="n in 10"
-                                                    :key="n"
-                                                    :value="n"
-                                                    :disabled="
-                                                        isPositionTaken(
-                                                            n,
-                                                            index
-                                                        )
-                                                    "
-                                                >
-                                                    {{ n }}
+                                                <option value="pitcher">
+                                                    Pitcher
                                                 </option>
-                                                <option value="EP">
-                                                    EP (Extra Player)
+                                                <option value="catcher">
+                                                    Catcher
+                                                </option>
+                                                <option value="infielder">
+                                                    Infielder
+                                                </option>
+                                                <option value="outfielder">
+                                                    Outfielder
+                                                </option>
+                                                <option value="utility">
+                                                    Utility
                                                 </option>
                                             </select>
                                         </td>
@@ -352,7 +350,6 @@ onMounted(() => {
                                                 type="date"
                                                 class="w-full"
                                                 v-model="player.birthdate"
-                                                required
                                             />
                                         </td>
 
