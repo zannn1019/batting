@@ -347,11 +347,13 @@ onMounted(() => {
                                         <td v-else>
                                             <TextInput
                                                 :id="`player_number_${index}`"
-                                                type="number"
+                                                type="text"
                                                 class="w-full"
                                                 v-model="player.number"
                                                 required
                                                 :class="{ 'border-red-500': isNumberTaken(player.number, index) }"
+                                                inputmode="numeric"
+                                                pattern="[0-9]*"
                                             />
                                             <span
                                                 v-if="isNumberTaken(player.number, index)"
