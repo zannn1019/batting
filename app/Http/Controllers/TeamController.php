@@ -54,11 +54,17 @@ class TeamController extends Controller
         DB::transaction(function () use ($request, &$team) {
             $data = $request->only(['logo', 'id_manager', 'team_name', 'head_coach', 'coach']);
 
-            if ($request->hasFile('logo')) {
-                $data['logo'] = $request->file('logo')->store('logos', 'public');
-            }
-
             $team = Team::create($data);
+
+            if ($request->hasFile('logo')) {
+                $logoFile = $request->file('logo');
+                $filename = $team->id . '.' . $logoFile->getClientOriginalExtension();
+
+                $path = $logoFile->storeAs('logos', $filename, 'public');
+
+                $team->logo = URL::to('/storage/' . $path);
+                $team->save();
+            }
 
             foreach ($request->players as $p) {
                 $team->players()->create([
@@ -98,7 +104,7 @@ class TeamController extends Controller
         return Inertia::render('Team/Form', [
             'team' => $team,
             'teamPlayers' => $team->players,
-            'managers' => User::where('role', 'manager')->get(),
+            'managers' => User::where('role', 'manager')->whereDoesntHave('team')->get(),
             'mode' => 'edit',
         ]);
     }
