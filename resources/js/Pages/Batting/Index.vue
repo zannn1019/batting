@@ -1,7 +1,9 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import { ref, computed } from "vue";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const props = defineProps({
     battings: Array,
@@ -9,6 +11,68 @@ const props = defineProps({
 
 const battings = computed(() => props.battings || []);
 const selectedBatting = ref(null);
+
+function exportToPDF() {
+    if (!selectedBatting.value) return;
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(16);
+    doc.text(
+        `Batting Order - ${selectedBatting.value.team?.team_name || "—"}`,
+        14,
+        20
+    );
+
+    // Opponent & Date
+    doc.setFontSize(12);
+    doc.text(
+        `Opponent: ${selectedBatting.value.opponent?.team_name || "—"}`,
+        14,
+        30
+    );
+    doc.text(
+        `Game Date: ${selectedBatting.value.game_date || "—"}`,
+        14,
+        38
+    );
+
+    // Table data
+    const tableColumn = ["#", "Player Name", "Position", "Batting Order"];
+    const tableRows = [];
+
+    if (selectedBatting.value.batting_orders?.length) {
+        selectedBatting.value.batting_orders.forEach((player, index) => {
+            tableRows.push([
+                index + 1,
+                player.player.full_name,
+                player.player.position,
+                player.batting_position,
+            ]);
+        });
+    } else {
+        tableRows.push(["-", "No players assigned", "-", "-"]);
+    }
+
+    autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 50,
+        theme: "grid",
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [41, 128, 185] }, // blue header
+    });
+
+    doc.save(
+        `Batting_${selectedBatting.value.team?.team_name || "Order"}.pdf`
+    );
+}
+
+function rejectBatting(id) {
+    console.log("Reject batting order with ID:", id);
+    // TODO: send axios/inertia request
+}
 </script>
 
 <template>
@@ -48,7 +112,7 @@ const selectedBatting = ref(null);
                                 <tr
                                     v-for="(batting, i) in battings"
                                     :key="batting.id"
-                                    class="align-middle "
+                                    class="align-middle"
                                 >
                                     <td class="px-4 py-2 border text-center">
                                         {{ i + 1 }}
@@ -81,7 +145,7 @@ const selectedBatting = ref(null);
                                                     ? 'bg-green-100 text-green-800'
                                                     : batting.status === 'rejected'
                                                     ? 'bg-red-100 text-red-800'
-                                                    : 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-yellow-100 text-yellow-800',
                                             ]"
                                         >
                                             {{ batting.status }}
@@ -115,6 +179,7 @@ const selectedBatting = ref(null);
                 <p class="py-2 text-sm text-gray-600">
                     Opponent: {{ selectedBatting?.opponent?.team_name }}
                 </p>
+
                 <div v-if="selectedBatting?.batting_orders?.length">
                     <table class="min-w-full border mt-4">
                         <thead class="bg-gray-100">
@@ -131,10 +196,18 @@ const selectedBatting = ref(null);
                                 :key="player.id_player"
                                 class="align-top"
                             >
-                                <td class="px-4 py-2 border text-center">{{ index + 1 }}</td>
-                                <td class="px-4 py-2 border">{{ player.player.full_name }}</td>
-                                <td class="px-4 py-2 border">{{ player.player.position }}</td>
-                                <td class="px-4 py-2 border text-center">{{ player.batting_position }}</td>
+                                <td class="px-4 py-2 border text-center">
+                                    {{ index + 1 }}
+                                </td>
+                                <td class="px-4 py-2 border">
+                                    {{ player.player.full_name }}
+                                </td>
+                                <td class="px-4 py-2 border">
+                                    {{ player.player.position }}
+                                </td>
+                                <td class="px-4 py-2 border text-center">
+                                    {{ player.batting_position }}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -142,33 +215,10 @@ const selectedBatting = ref(null);
                 <span v-else class="text-gray-400">No players assigned</span>
 
                 <div class="modal-action">
-                    <label for="detail-modal" class="btn">Close</label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Reject Modal -->
-        <input type="checkbox" id="reject-modal" class="modal-toggle" />
-        <div class="modal">
-            <div class="modal-box">
-                <h3 class="font-bold text-lg">
-                    Confirm Reject
-                </h3>
-                <p class="py-4">
-                    Are you sure you want to
-                    reject batting order for
-                    <span class="font-semibold">
-                        {{ selectedBatting?.team?.team_name }}
-                    </span>?
-                </p>
-                <div class="modal-action">
-                    <label for="reject-modal" class="btn">Cancel</label>
-                    <button
-                        class="btn btn-error text-white"
-                        @click="rejectBatting(selectedBatting.id)"
-                    >
-                        Reject
+                    <button class="btn btn-success" @click="exportToPDF">
+                        Export PDF
                     </button>
+                    <label for="detail-modal" class="btn">Close</label>
                 </div>
             </div>
         </div>
