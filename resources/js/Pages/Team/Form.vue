@@ -71,10 +71,16 @@ function addPlayer() {
         birthdate: "",
     });
 }
+
+function isNumberTaken(number, currentIndex) {
+    return players.value.some(
+        (p, i) => i !== currentIndex && p.number == number && number !== ""
+    );
+}
+
 function removePlayer(index) {
     players.value.splice(index, 1);
 }
-
 function submit() {
     if (!form.team_name || !form.head_coach || !form.id_manager) {
         alert("Team name, head coach, and manager are required.");
@@ -83,6 +89,14 @@ function submit() {
 
     if (players.value.length === 0) {
         alert("Please add at least one player.");
+        return;
+    }
+
+    // Check for duplicate jersey numbers
+    const numbers = players.value.map((p) => p.number).filter((n) => n !== "");
+    const hasDuplicateNumber = numbers.length !== new Set(numbers).size;
+    if (hasDuplicateNumber) {
+        alert("There are players with the same jersey number. Please ensure each player has a unique number.");
         return;
     }
 
@@ -337,7 +351,14 @@ onMounted(() => {
                                                 class="w-full"
                                                 v-model="player.number"
                                                 required
+                                                :class="{ 'border-red-500': isNumberTaken(player.number, index) }"
                                             />
+                                            <span
+                                                v-if="isNumberTaken(player.number, index)"
+                                                class="text-xs text-red-500"
+                                            >
+                                                Number already taken!
+                                            </span>
                                         </td>
 
                                         <!-- Birthdate -->
