@@ -12,6 +12,19 @@ const props = defineProps({
 const battings = computed(() => props.battings || []);
 const selectedBatting = ref(null);
 
+// Helper to sort batting orders by batting_position (numeric, NaN last)
+function getSortedOrders(orders) {
+    return [...(orders || [])].sort((a, b) => {
+        const aPos = isNaN(Number(a.batting_position))
+            ? Infinity
+            : Number(a.batting_position);
+        const bPos = isNaN(Number(b.batting_position))
+            ? Infinity
+            : Number(b.batting_position);
+        return aPos - bPos;
+    });
+}
+
 function exportToPDF() {
     if (!selectedBatting.value) return;
 
@@ -37,16 +50,8 @@ function exportToPDF() {
     const tableColumn = ["#", "Player Name", "Position", "Back Number"];
     const tableRows = [];
     if (selectedBatting.value.batting_orders?.length) {
-        const sortedOrders = [...selectedBatting.value.batting_orders].sort(
-            (a, b) => {
-                const aPos = isNaN(Number(a.batting_position))
-                    ? Infinity
-                    : Number(a.batting_position);
-                const bPos = isNaN(Number(b.batting_position))
-                    ? Infinity
-                    : Number(b.batting_position);
-                return aPos - bPos;
-            }
+        const sortedOrders = getSortedOrders(
+            selectedBatting.value.batting_orders
         );
         sortedOrders.forEach((player, index) => {
             tableRows.push([
@@ -207,7 +212,7 @@ function rejectBatting(id) {
                             <tr
                                 v-for="(
                                     player, index
-                                ) in selectedBatting.batting_orders"
+                                ) in getSortedOrders(selectedBatting.batting_orders)"
                                 :key="player.id_player"
                                 class="align-top"
                             >
