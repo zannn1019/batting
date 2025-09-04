@@ -57,7 +57,7 @@ function exportToPDF() {
             tableRows.push([
                 index + 1,
                 player.player.full_name,
-                player.batting_position || "-",
+                player.batting_orders,
                 "#" + player.player.back_number,
             ]);
         });
