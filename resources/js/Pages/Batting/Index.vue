@@ -187,7 +187,7 @@ function rejectBatting(id) {
                                 <th class="px-4 py-2 border">#</th>
                                 <th class="px-4 py-2 border">Player Name</th>
                                 <th class="px-4 py-2 border">Position</th>
-                                <th class="px-4 py-2 border">Batting Order</th>
+                                <th class="px-4 py-2 border">Back Number</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -202,11 +202,11 @@ function rejectBatting(id) {
                                 <td class="px-4 py-2 border">
                                     {{ player.player.full_name }}
                                 </td>
-                                <td class="px-4 py-2 border">
-                                    {{ player.player.position }}
-                                </td>
                                 <td class="px-4 py-2 border text-center">
                                     {{ player.batting_position }}
+                                </td>
+                                <td class="px-4 py-2 border">
+                                    {{ player.player.back_number }}
                                 </td>
                             </tr>
                         </tbody>
