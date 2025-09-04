@@ -12,19 +12,6 @@ const props = defineProps({
 const battings = computed(() => props.battings || []);
 const selectedBatting = ref(null);
 
-// Helper to sort batting orders by batting_position (numeric, NaN last)
-function getSortedOrders(orders) {
-    return [...(orders || [])].sort((a, b) => {
-        const aPos = isNaN(Number(a.batting_position))
-            ? Infinity
-            : Number(a.batting_position);
-        const bPos = isNaN(Number(b.batting_position))
-            ? Infinity
-            : Number(b.batting_position);
-        return aPos - bPos;
-    });
-}
-
 function exportToPDF() {
     if (!selectedBatting.value) return;
 
@@ -45,19 +32,22 @@ function exportToPDF() {
         14,
         30
     );
-    doc.text(`Game Date: ${selectedBatting.value.game_date || "—"}`, 14, 38);
+    doc.text(
+        `Game Date: ${selectedBatting.value.game_date || "—"}`,
+        14,
+        38
+    );
 
+    // Table data
     const tableColumn = ["#", "Player Name", "Position", "Back Number"];
     const tableRows = [];
+
     if (selectedBatting.value.batting_orders?.length) {
-        const sortedOrders = getSortedOrders(
-            selectedBatting.value.batting_orders
-        );
-        sortedOrders.forEach((player, index) => {
+        selectedBatting.value.batting_orders.forEach((player, index) => {
             tableRows.push([
                 index + 1,
                 player.player.full_name,
-                player.batting_orders,
+                player.batting_position,
                 "#" + player.player.back_number,
             ]);
         });
@@ -74,7 +64,9 @@ function exportToPDF() {
         headStyles: { fillColor: [41, 128, 185] }, // blue header
     });
 
-    doc.save(`Batting_${selectedBatting.value.team?.team_name || "Order"}.pdf`);
+    doc.save(
+        `Batting_${selectedBatting.value.team?.team_name || "Order"}.pdf`
+    );
 }
 
 function rejectBatting(id) {
@@ -90,9 +82,7 @@ function rejectBatting(id) {
         <template #header>
             <div class="flex justify-between items-center">
                 <div class="flex flex-col">
-                    <h2
-                        class="text-xl font-semibold leading-tight text-gray-800"
-                    >
+                    <h2 class="text-xl font-semibold leading-tight text-gray-800">
                         Batting Orders
                     </h2>
                     <p class="mt-1 text-sm text-gray-600">
@@ -134,18 +124,11 @@ function rejectBatting(id) {
                                         {{ batting.opponent?.team_name || "—" }}
                                     </td>
                                     <td class="px-4 py-2 border">
-                                        {{
-                                            $formatGameTime(
-                                                batting.game_date
-                                            ) || "—"
-                                        }}
+                                        {{ $formatGameTime(batting.game_date) || "—" }}
                                     </td>
                                     <td class="px-4 py-2 border">
                                         <div
-                                            v-if="
-                                                batting.batting_orders &&
-                                                batting.batting_orders.length
-                                            "
+                                            v-if="batting.batting_orders && batting.batting_orders.length"
                                             class="list-disc pl-5"
                                         >
                                             {{ batting.batting_orders.length }}
@@ -160,8 +143,7 @@ function rejectBatting(id) {
                                                 'inline-block px-2 py-1 rounded text-xs font-semibold',
                                                 batting.status === 'approved'
                                                     ? 'bg-green-100 text-green-800'
-                                                    : batting.status ===
-                                                      'rejected'
+                                                    : batting.status === 'rejected'
                                                     ? 'bg-red-100 text-red-800'
                                                     : 'bg-yellow-100 text-yellow-800',
                                             ]"
@@ -210,9 +192,7 @@ function rejectBatting(id) {
                         </thead>
                         <tbody>
                             <tr
-                                v-for="(
-                                    player, index
-                                ) in getSortedOrders(selectedBatting.batting_orders)"
+                                v-for="(player, index) in selectedBatting.batting_orders"
                                 :key="player.id_player"
                                 class="align-top"
                             >
