@@ -206,7 +206,7 @@ function rejectBatting(id) {
                                     {{ player.batting_position }}
                                 </td>
                                 <td class="px-4 py-2 border">
-                                    {{ player.player.back_number }}
+                                    #{{ player.player.back_number }}
                                 </td>
                             </tr>
                         </tbody>
